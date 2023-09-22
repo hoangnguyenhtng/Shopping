@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html xmlns:th="https://www.thymeleaf.org/">
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<meta name="viewport" content="width=device-width,initial-scale=1.0, minimum-scale=1.0">
+		
+		<title>Manage Users</title>
+		
+		<link rel="stylesheet" type="text/css" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}" />
+		<link rel="stylesheet" type="text/css" th:href="@{/fontawesome/all.css}" />
+		<link rel="stylesheet" type="text/css" th:href="@{/style.css}" />
+
+		<script type="text/javascript" th:src="@{/webjars/jquery/jquery.min.js}"></script>
+		<script type="text/javascript" th:src="@{/webjars/bootstrap/js/bootstrap.min.js}"></script>
+
+	</head>
+	<body>
+		<div class="container-fluid">
+			<div>
+				<nav class="navbar navbar-expand-lg bg-dark navbar-dark">
+					<a class="navbar-brand" th:href="@{/}">
+						<img th:src="@{/images/ShopmeAdminSmall.png}"/>
+					</a>
+					<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#topNavbar">
+						<span class="navbar-toggler-icon"></span>
+					</button>
+					<div class="collapse navbar-collapse" id="topNavbar">
+						<ul class="navbar-nav">
+							<li class="nav-item">
+								<a class="nav-link" th:href="@{/users}">Users</a>
+							</li>
+							<li class="nav-item">
+								<a class="nav-link" th:href="@{/categories}">Categories</a>
+							</li>
+							<li class="nav-item">
+								<a class="nav-link" th:href="@{/brands}">Brands</a>
+							</li>
+							<li class="nav-item">
+								<a class="nav-link" th:href="@{/products}">Products</a>
+							</li>
+							<li class="nav-item">
+								<a class="nav-link" th:href="@{/customers}">Customers</a>
+							</li>
+							<li class="nav-item">
+								<a class="nav-link" th:href="@{/shipping}">Shipping</a>
+							</li>
+							<li class="nav-item">
+								<a class="nav-link" th:href="@{/orders}">Orders</a>
+							</li>
+							<li class="nav-item">
+								<a class="nav-link" th:href="@{/report}">Sales Report</a>
+							</li>
+							<li class="nav-item">
+								<a class="nav-link" th:href="@{/articles}">Articles</a>
+							</li>
+							<li class="nav-item">
+								<a class="nav-link" th:href="@{/menus}">Menus</a>
+							</li>
+							<li class="nav-item">
+								<a class="nav-link" th:href="@{/settings}">Settings</a>
+							</li>
+							
+						</ul>
+					</div>
+				</nav>
+			</div>
+			<brdiv>
+				<h2>Manage Users</h2>
+				</br>
+				<a th:href="@{/users/new}" class="fa-solid fa-user-plus fa-2xl icon-dark" style="text-decoration: none;"></a>
+				&nbsp;|&nbsp;
+				<a th:href="@{/users/export/csv}" class="fa-solid fa-file-csv fa-2xl icon-dark" style="text-decoration: none;"></a>
+				&nbsp;|&nbsp;
+				<a th:href="@{/users/export/excel}"class="fa-solid fa-file-excel fa-2xl icon-dark" style="text-decoration: none;"></a>
+				&nbsp;|&nbsp;
+				<a th:href="@{/users/export/pdf}" class="fa-solid fa-file-pdf fa-2xl icon-dark" style="text-decoration: none;"></a>
+
+			</div>
+			
+			<div th:if="${message != null}" class="alert alert-success text-center">
+				[[${message}]]
+			</div>
+			
+			<div>
+				<form th:action="@{/users/page/1}" class="form-inline m-3">
+					<input type="hidden" name="sortField" th:value="${sortField}" />
+					<input type="hidden" name="sortDir" th:value="${sortDir}" />
+					Filter:&nbsp;
+					<input type="search" name="keyword" th:value="${keyword}" class="form-control" required/>
+					&nbsp;&nbsp;
+					<button type="submit" value="Search" class="btn btn-primary">
+						<i class="fa-solid fa-magnifying-glass fa-xl"></i>
+					</button>
+					&nbsp;&nbsp;
+					<button type="button" value="Clear" class="btn btn-secondary" onclick="clearFilter()">
+						<i class="fa-solid fa-eraser fa-xl"></i>
+					</button>
+				</form>
+			</div>
+			
+			<div class="full-details">
+				<table class="table table-bordered table-striped table-hover table-responsive-xl">
+					<thead class="thead-dark">
+						<tr>
+							<th class="hideable-column">
+								<th th:replace="fragments :: column_link('id','User ID','tag')"/>
+							</th>
+							<th>Photo</th>	
+							<th class="hideable-column">
+								<th th:replace="fragments :: column_link('email','E-mail','tag')"/>
+							</th>						
+							<th th:replace="fragments :: column_link('firstName','First Name','none')"/>
+												
+							<th th:replace="fragments :: column_link('lastName','Last Name','none')"/>						
+							<th>Roles</th>						
+							<th th:replace="fragments :: column_link('enabled','Enabled','none')"/>	
+						</tr>
+					</thead>
+					<tbody>
+						<tr th:each="user : ${listUsers}">
+							<td class="hideable-column">[[${user.id}]]</td>
+							<td>
+								<span th:if="${user.photos == null}" class="fa-solid fa-image-portrait fa-2xl icon-silver"></span>
+								<img style="height: 80px; width: 60px" th:if="${user.photos != null}"	th:src="@{${user.photosImagePath}}"/>
+								
+							</td>
+							<td class="hideable-column">[[${user.email}]]</td>
+							<td>[[${user.firstName}]]</td>
+							<td>[[${user.lastName}]]</td>
+							<td>[[${user.roles}]]</td>
+							<td>
+								<a style="text-decoration: none" th:if="${user.enabled == true}" class="fa-solid fa-circle-check fa-2xl icon-green" 
+								th:href="@{'/users/' + ${user.id} + '/enabled/false'}"
+								title="Disable this user"></a>
+								
+								<a style="text-decoration: none" th:if="${user.enabled == false}" class="fa-solid fa-circle fa-2xl icon-dark" 
+								th:href="@{'/users/' + ${user.id} + '/enabled/true'}"
+								title="Enable this user"></a>
+								
+							</td>
+							<td>
+								<a style="text-decoration: none" class="fa-regular fa-pen-to-square icon-green fa-2xl" 
+								th:href="@{'/users/edit/' + ${user.id}}"
+								title="Chỉnh sửa tài khoản"></a>
+								&nbsp;
+								<a style="text-decoration: none" class="fa-solid fa-trash icon-dark fa-2xl link-delete" 
+								th:href="@{'users/delete/' + ${user.id}}"
+								th:userId="${user.id}"
+								title="Xóa tài khoản"></a>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			
+			<div class="less-details">
+				<div th:each="user : ${listUsers}" class="row m-1">
+					<div class="col-4">
+						<span th:if="${user.photos == null}" class="fa-solid fa-image-portrait fa-2xl icon-silver"></span>
+						<img style="height: 80px; width: 60px" th:if="${user.photos != null}"	th:src="@{${user.photosImagePath}}"/>
+					</div>
+					<div class="col-8">
+							<div>[[${user.fullName}]]</div>
+							<div>[[${user.roles}]]</div>
+						<div class="mt-2">
+							<td>
+								<a style="text-decoration: none" th:if="${user.enabled == true}" class="fa-solid fa-circle-check fa-2xl icon-green" 
+								th:href="@{'/users/' + ${user.id} + '/enabled/false'}"
+								title="Disable this user"></a>
+								
+								<a style="text-decoration: none" th:if="${user.enabled == false}" class="fa-solid fa-circle fa-2xl icon-dark" 
+								th:href="@{'/users/' + ${user.id} + '/enabled/true'}"
+								title="Enable this user"></a>
+								&nbsp;
+								<a style="text-decoration: none" class="fa-regular fa-pen-to-square icon-green fa-2xl" 
+								th:href="@{'/users/edit/' + ${user.id}}"
+								title="Chỉnh sửa tài khoản"></a>
+								&nbsp;
+								<a style="text-decoration: none" class="fa-solid fa-trash icon-dark fa-2xl link-delete" 
+								th:href="@{'users/delete/' + ${user.id}}"
+								th:userId="${user.id}"
+								title="Xóa tài khoản"></a>
+							</td>
+						</div>
+					<div>&nbsp;</div>
+				</div>
+			</div>
+			</div>
+			
+			<div th:if="${totalPages > 0}" class="text-center m-1">
+				<span><i class="fa-brands fa-page4"></i> Hiển thị tài khoản # [[${startCount}]] <i class="fa-solid fa-arrow-right"></i> [[${endCount}]] trên tổng số [[${totalItems}]]</span>
+			</div>
+			<div class="text-center m-1" th:unless="${totalItems > 0}">
+				<span>Không thấy tài khoản nào!</span>
+			</div>
+			<div>
+				<nav th:if="${totalPages> 0}">
+  					<ul class="pagination justify-content-center flex-wrap">
+						<li th:class="${currentPage > 1 ? 'page-item' : 'page-item disabled'}">
+      						<a class="page-link" th:href="@{'/users/page/1?sortField=' + ${sortField} + '&sortDir=' + ${sortDir}}">First</a>
+    					</li>
+    					<li th:class="${currentPage > 1 ? 'page-item' : 'page-item disabled'}">
+      						<a class="page-link" th:href="@{'/users/page/' + ${currentPage - 1} + '?sortField=' + ${sortField} + '&sortDir=' + ${sortDir}}">Previous</a>
+    					</li>
+						<li th:class="${currentPage != i ? 'page-item' : 'page-item active'}" 
+							th:each="i : ${#numbers.sequence(1, totalPages)}">
+      						<a class="page-link" th:href="@{'/users/page/' + ${i} + '?sortField=' + ${sortField} + '&sortDir=' + ${sortDir}}">[[${i}]]</a>
+    					</li>
+    					<li th:class="${totalPages > currentPage ? 'page-item' : 'page-item disabled'}">
+      						<a class="page-link" th:href="@{'/users/page/' + ${currentPage + 1} + '?sortField=' + ${sortField} + '&sortDir=' + ${sortDir}}">Next</a>
+    					</li>
+    					<li class="page-item">
+      						<a class="page-link" th:href="@{'/users/page/' + ${totalPages} + '?sortField=' + ${sortField} + '&sortDir=' + ${sortDir}}">Last</a>
+    					</li>
+  					</ul>
+				</nav>
+			</div>
+
+
+			
+			<div class="modal fade text-center" id="confirmModal">
+				<div class="modal-dialog">
+					<div class="modal-content">
+						<div class="modal-header">
+							<h4 class="modal-title" id="modalTitle">Xác nhận xóa người dùng </h4>
+							<button type="button" class="close" data-dismiss="modal">&times;</button>
+						</div>
+						
+						<div class="modal-body">
+							<span id="confirmText"></span>
+						</div>
+						
+						<div class="modal-footer">
+							<a class="btn btn-success" href="" id="yesButton">Đồng ý</a>
+							<button type="button" class="btn btn-danger" data-dismiss="modal">Hủy bỏ</button>
+						</div>
+					</div>
+				</div>
+			</div>
+			</div>
+			
+			<div class="text-center">
+				<p>Shopme Control Panel - Copyright &copy; Shopme</p>
+			</div>
+		</div>
+		<script type="text/javascript">
+			$(document).ready(function(){
+				$(".link-delete").on("click",function(e){
+					e.preventDefault();
+					link = $(this);
+					//alert($(this).attr("href"));
+					userId = link.attr("userId");
+					$("#yesButton").attr("href", link.attr("href"));
+					$("#confirmText").text("Bạn có chắc chắn sẽ xóa người dùng ID " + userId + " ?");
+					$("#confirmModal").modal();
+				});
+			});
+			
+			function clearFilter(){
+				window.location = "[[@{/users}]]"
+			}
+		</script>
+	</body>
+</html>
